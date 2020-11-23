@@ -41,6 +41,13 @@
     },
   });
 
+  window.snowplow('newTracker', 'b64off', collector_endpoint, {
+    appId: 'no-b64',
+    platform: 'web',
+    eventMethod: parseQuery().eventMethod,
+    encodeBase64: false,
+  });
+
   // Add a global context
   var geolocationContext = {
     schema: 'iglu:com.snowplowanalytics.snowplow/geolocation_context/jsonschema/1-1-0',
@@ -70,13 +77,15 @@
     return {};
   }
 
-  window.snowplow('enableGdprContext', 'consent', 'someId', '0.1.0', 'this document is a test');
+  window.snowplow('enableGdprContext:cf', 'consent', 'someId', '0.1.0', 'this document is a test');
 
-  window.snowplow('addGlobalContexts', [erroneousContextGenerator]);
-  window.snowplow('addGlobalContexts', [[structuredEventFilter, [eventTypeContextGenerator, geolocationContext]]]);
+  window.snowplow('addGlobalContexts:cf', [erroneousContextGenerator]);
+  window.snowplow('addGlobalContexts:cf', [[structuredEventFilter, [eventTypeContextGenerator, geolocationContext]]]);
 
-  window.snowplow('setUserId', 'Malcolm');
-  window.snowplow('trackPageView', 'My Title', [ // Auto-set page title; add page context
+  window.snowplow('setUserId:cf', 'Malcolm');
+
+  // Also tracks to non-base64 encoding tracker
+  window.snowplow('trackPageView:cf;b64off', 'My Title', [ // Set page title; add page context
     {
       schema: "iglu:org.schema/WebPage/jsonschema/1-0-0",
       data: {
@@ -86,10 +95,10 @@
   ]);
 
   // This should have different pageViewId in web_page context
-  window.snowplow('trackPageView');
+  window.snowplow('trackPageView:cf');
 
-  window.snowplow('trackStructEvent', 'Mixes', 'Play', 'MRC/fabric-0503-mix', '', '0.0');
-  window.snowplow('trackUnstructEvent', {
+  window.snowplow('trackStructEvent:cf', 'Mixes', 'Play', 'MRC/fabric-0503-mix', '', '0.0');
+  window.snowplow('trackUnstructEvent:cf', {
     schema: 'iglu:com.snowplowanalytics.snowplow/ad_impression/jsonschema/1-0-0',
     data: {
       bannerId: 'ASO01043'
@@ -98,7 +107,7 @@
 
   var orderId = 'order-123';
 
-  window.snowplow('addTrans',
+  window.snowplow('addTrans:cf',
     orderId,
     'acme',
     '8000',
@@ -112,7 +121,7 @@
 
   // addItem might be called for each item in the shopping cart,
   // or not at all.
-  window.snowplow('addItem',
+  window.snowplow('addItem:cf',
     orderId,
     '1001',
     'Blue t-shirt',
@@ -124,7 +133,7 @@
 
   // trackTrans sends the transaction to Snowplow tracking servers.
   // Must be called last to commit the transaction.
-  window.snowplow('trackTrans');
+  window.snowplow('trackTrans:cf');
 
   var testAcceptRuleSet = {
     accept: ['iglu:com.snowplowanalytics.snowplow/*/jsonschema/*-*-*']
@@ -134,19 +143,19 @@
   };
 
   // test context rulesets
-  window.snowplow('addGlobalContexts', [[testAcceptRuleSet, [eventTypeContextGenerator, geolocationContext]]]);
+  window.snowplow('addGlobalContexts:cf', [[testAcceptRuleSet, [eventTypeContextGenerator, geolocationContext]]]);
 
-  window.snowplow('trackUnstructEvent', {
+  window.snowplow('trackUnstructEvent:cf', {
     schema: 'iglu:com.snowplowanalytics.snowplow/ad_impression/jsonschema/1-0-0',
     data: {
       bannerId: 'ASO01042'
     }
   }, [], {type: 'ttm', value: 1477401869});
 
-  window.snowplow('removeGlobalContexts', [[testAcceptRuleSet, [eventTypeContextGenerator, geolocationContext]]]);
+  window.snowplow('removeGlobalContexts:cf', [[testAcceptRuleSet, [eventTypeContextGenerator, geolocationContext]]]);
 
-  window.snowplow('addGlobalContexts', [[testRejectRuleSet, [eventTypeContextGenerator, geolocationContext]]]);
-  window.snowplow('trackUnstructEvent', {
+  window.snowplow('addGlobalContexts:cf', [[testRejectRuleSet, [eventTypeContextGenerator, geolocationContext]]]);
+  window.snowplow('trackUnstructEvent:cf', {
     schema: 'iglu:com.snowplowanalytics.snowplow/ad_impression/jsonschema/1-0-0',
     data: {
       bannerId: 'ASO01041'
@@ -154,7 +163,7 @@
   }, [], {type: 'ttm', value: 1477401868});
 
   // track unhandled exception
-  window.snowplow("enableErrorTracking");
+  window.snowplow('enableErrorTracking:cf');
 
   // Test for exception handling
   function raiseException() {

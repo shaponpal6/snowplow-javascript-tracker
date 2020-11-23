@@ -327,4 +327,28 @@ describe('Test that request_recorder logs meet expectations', () => {
       })
     ).toBe(true)
   })
+
+  it('Check existence of page view with non-base64 encoded context payload', () => {
+    expect(
+      logContains({
+        rawEvent: {
+          parameters: {
+            co: '{"schema":"iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-0","data":[{"schema":"iglu:org.schema/WebPage/jsonschema/1-0-0","data":{"keywords":["tester"]}}]}'
+          },
+        },
+        event: {
+          event: 'page_view',
+          platform: 'web',
+          app_id: 'no-b64',
+          page_title: 'My Title',
+          contexts: {
+            data: [{
+              schema: 'iglu:org.schema/WebPage/jsonschema/1-0-0',
+              data: { keywords: ['tester'] }
+            }]
+          }
+        },
+      })
+    ).toBe(true)
+  })
 })
