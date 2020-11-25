@@ -34,6 +34,7 @@
 import util from 'util'
 import F from 'lodash/fp'
 import { fetchResults, start, stop } from '../micro'
+import { version } from '../../package.json'
 
 const dumpLog = log => console.log(util.inspect(log, true, null, true))
 
@@ -90,6 +91,21 @@ describe('Snowplow Micro integration test', () => {
     browser.call(() => {
       return stop(docker.container)
     })
+  })
+
+  it('contains correct tracker version', () => {
+    expect(
+      logContains({
+        rawEvent: {
+          parameters: {
+            tv: `js-${version}`
+          }
+        },
+        event: {
+          v_tracker: `js-${version}`
+        },
+      })
+    ).toBe(true)
   })
 
   it('contains page view', () => {
