@@ -59,7 +59,7 @@ const geoContext = {
   },
 }
 
-describe('Test that request_recorder logs meet expectations', () => {
+describe('Snowplow Micro integration test', () => {
   let log = []
   let docker
 
@@ -78,7 +78,7 @@ describe('Test that request_recorder logs meet expectations', () => {
       browser.setNetworkConditions({}, 'Regular 2G') 
     }
     browser.url('/integration.html?eventMethod=get')
-    browser.pause(7500) // Time for requests to get written
+    browser.pause(15000) // Time for requests to get written
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
@@ -92,7 +92,7 @@ describe('Test that request_recorder logs meet expectations', () => {
     })
   })
 
-  it('Check existence of page view', () => {
+  it('contains page view', () => {
     expect(
       logContains({
         event: {
@@ -106,7 +106,7 @@ describe('Test that request_recorder logs meet expectations', () => {
     ).toBe(true)
   })
 
-  it('Check existence of page view with custom context in log', () => {
+  it('contains page view with custom context in log', () => {
     const expected = {
       event: {
         event: 'page_view',
@@ -126,7 +126,7 @@ describe('Test that request_recorder logs meet expectations', () => {
     expect(logContains(expected)).toBe(true)
   })
 
-  it('Check nonexistence of nonexistent event types in log', () => {
+  it('contains nonnonexistent event types in log', () => {
     expect(
       logContains({
         event: 'ad',
@@ -134,7 +134,7 @@ describe('Test that request_recorder logs meet expectations', () => {
     ).toBe(false)
   })
 
-  it('Check a structured event was sent', () => {
+  it('contains a structured event', () => {
     expect(
       logContains({
         event: {
@@ -148,7 +148,7 @@ describe('Test that request_recorder logs meet expectations', () => {
     ).toBe(true)
   })
 
-  it('Check an unstructured event with true timestamp was sent', () => {
+  it('contains an unstructured event with true timestamp', () => {
     expect(
       logContains({
         event: {
@@ -164,7 +164,7 @@ describe('Test that request_recorder logs meet expectations', () => {
     ).toBe(true)
   })
 
-  it('Check a transaction event was sent', () => {
+  it('contains a transaction event', () => {
     expect(
       logContains({
         event: {
@@ -183,7 +183,7 @@ describe('Test that request_recorder logs meet expectations', () => {
     ).toBe(true)
   })
 
-  it('Check a transaction item event was sent', () => {
+  it('contains a transaction item event', () => {
     expect(
       logContains({
         event: {
@@ -200,21 +200,28 @@ describe('Test that request_recorder logs meet expectations', () => {
     ).toBe(true)
   })
 
-  it('Check an unhandled exception was sent', () => {
+  it('contains an unhandled exception event', () => {
     expect(
       logContains({
-        event: {
-          unstruct_event: {
-            data: {
-              schema: 'iglu:com.snowplowanalytics.snowplow/application_error/jsonschema/1-0-1'
+          event: {
+            unstruct_event: {
+              data: {
+                schema: 'iglu:com.snowplowanalytics.snowplow/application_error/jsonschema/1-0-1'
+              }
+            },
+            contexts: {
+              data: [{
+                schema: 'iglu:org.schema/WebPage/jsonschema/1-0-0',
+                data: { keywords: ['tester'] }
+              }]
             }
           }
         }
-      })
+      )
     ).toBe(true)
   })
 
-  it('Check pageViewId is regenerated for each trackPageView', () => {
+  it('shows that pageViewId is regenerated for each trackPageView', () => {
     const pageViews = F.filter(
       ev =>
         F.get('event.event', ev) === 'page_view' &&
@@ -233,7 +240,7 @@ describe('Test that request_recorder logs meet expectations', () => {
     expect(F.size(F.groupBy(getWebPageId, pageViews))).toBeGreaterThanOrEqual(2)
   })
 
-  it('Check a GDPR context', () => {
+  it('contains a GDPR context', () => {
     expect(
       logContains({
         event: {
@@ -253,7 +260,7 @@ describe('Test that request_recorder logs meet expectations', () => {
     ).toBe(true)
   })
 
-  it('Check that all events have a GDPR context attached', () => {
+  it('has a GDPR context attached to all events', () => {
     const withoutGdprContext = F.compose(
       F.negate(
         F.includes('iglu:com.snowplowanalytics.snowplow/gdpr/jsonschema/1-0-0')
@@ -273,7 +280,7 @@ describe('Test that request_recorder logs meet expectations', () => {
     expect(numberWithoutGdpr).toBe(0)
   })
 
-  it('Check global contexts are for structured events', () => {
+  it('has global contexts attached to structured events', () => {
     expect(
       logContains({
         event: {
@@ -286,7 +293,7 @@ describe('Test that request_recorder logs meet expectations', () => {
     ).toBe(true)
   })
 
-  it('Check an unstructured event with global context from accept ruleset', () => {
+  it('contains an unstructured event with global context from accept ruleset', () => {
     expect(
       logContains({
         event: {
@@ -307,7 +314,7 @@ describe('Test that request_recorder logs meet expectations', () => {
     ).toBe(true)
   })
 
-  it('Check an unstructured event missing global context from reject ruleset', () => {
+  it('contains an unstructured event missing global context from reject ruleset', () => {
     expect(
       logContains({
         event: {
@@ -328,7 +335,7 @@ describe('Test that request_recorder logs meet expectations', () => {
     ).toBe(true)
   })
 
-  it('Check existence of page view with non-base64 encoded context payload', () => {
+  it('contains page view event with non-base64 encoded context payload', () => {
     expect(
       logContains({
         rawEvent: {
@@ -351,4 +358,365 @@ describe('Test that request_recorder logs meet expectations', () => {
       })
     ).toBe(true)
   })
+
+  it('contains social interaction event', () => {
+    expect(
+      logContains({
+        event: {
+          event: 'unstruct',
+          platform: 'mob',
+          app_id: 'CFe23a',
+          user_id: 'Malcolm',
+          unstruct_event: {
+            data: {
+              schema: 'iglu:com.snowplowanalytics.snowplow/social_interaction/jsonschema/1-0-0',
+              data: { action: 'retweet', network: 'twitter', target: '1234' }
+            }
+          }
+        },
+      })
+    ).toBe(true)
+  })
+
+  it('contains ad impression event', () => {
+    expect(
+      logContains({
+        event: {
+          event: 'unstruct',
+          platform: 'mob',
+          app_id: 'CFe23a',
+          user_id: 'Malcolm',
+          unstruct_event: {
+            data: {
+              schema: 'iglu:com.snowplowanalytics.snowplow/ad_impression/jsonschema/1-0-0',
+              data: {
+                impressionId: "67965967893",
+                costModel: "cpm",
+                cost: 5.5,
+                targetUrl: "http://www.example.com",
+                bannerId: "23",
+                zoneId: "7",
+                advertiserId: "201",
+                campaignId: "12"
+              }
+            }
+          }
+        },
+      })
+    ).toBe(true)
+  })
+
+  it('contains ad click event', () => {
+    expect(
+      logContains({
+        event: {
+          event: 'unstruct',
+          platform: 'mob',
+          app_id: 'CFe23a',
+          user_id: 'Malcolm',
+          unstruct_event: {
+            data: {
+              schema: 'iglu:com.snowplowanalytics.snowplow/ad_click/jsonschema/1-0-0',
+              data: {
+                impressionId: "67965967893",
+                clickId: "12243253",
+                costModel: "cpm",
+                cost: 2.5,
+                targetUrl: "http://www.example.com",
+                bannerId: "23",
+                zoneId: "7",
+                advertiserId: "201",
+                campaignId: "12"
+              }
+            }
+          }
+        },
+      })
+    ).toBe(true)
+  })
+
+  it('contains ad conversion event', () => {
+    expect(
+      logContains({
+        event: {
+          event: 'unstruct',
+          platform: 'mob',
+          app_id: 'CFe23a',
+          user_id: 'Malcolm',
+          unstruct_event: {
+            data: {
+              schema: 'iglu:com.snowplowanalytics.snowplow/ad_conversion/jsonschema/1-0-0',
+              data: {
+                conversionId: "743560297",
+                costModel: "cpa",
+                cost: 10,
+                category: "ecommerce",
+                action: "purchase",
+                property: '',
+                initialValue: 99,
+                advertiserId: "201",
+                campaignId: "12"
+              }
+            }
+          }
+        },
+      })
+    ).toBe(true)
+  })
+
+  it('contains add to cart event', () => {
+    expect(
+      logContains({
+        event: {
+          event: 'unstruct',
+          platform: 'mob',
+          app_id: 'CFe23a',
+          user_id: 'Malcolm',
+          unstruct_event: {
+            data: {
+              schema: 'iglu:com.snowplowanalytics.snowplow/add_to_cart/jsonschema/1-0-0',
+              data: {
+                sku: "000345",
+                name: "blue tie",
+                category: "clothing",
+                unitPrice: 3.49,
+                quantity: 2,
+                currency: "GBP"
+              }
+            }
+          }
+        },
+      })
+    ).toBe(true)
+  })
+
+  it('contains remove from cart event', () => {
+    expect(
+      logContains({
+        event: {
+          event: 'unstruct',
+          platform: 'mob',
+          app_id: 'CFe23a',
+          user_id: 'Malcolm',
+          unstruct_event: {
+            data: {
+              schema: 'iglu:com.snowplowanalytics.snowplow/remove_from_cart/jsonschema/1-0-0',
+              data: {
+                sku: "000345",
+                name: "blue tie",
+                category: "clothing",
+                unitPrice: 3.49,
+                quantity: 1,
+                currency: "GBP"
+              }
+            }
+          }
+        },
+      })
+    ).toBe(true)
+  })
+
+  it('contains site search event', () => {
+    expect(
+      logContains({
+        event: {
+          event: 'unstruct',
+          platform: 'mob',
+          app_id: 'CFe23a',
+          user_id: 'Malcolm',
+          unstruct_event: {
+            data: {
+              schema: 'iglu:com.snowplowanalytics.snowplow/site_search/jsonschema/1-0-0',
+              data: {
+                terms: [ "unified", "log" ],
+                filters: { "category": "books", "sub-category": "non-fiction" },
+                totalResults: 14,
+                pageResults: 8
+              }
+            }
+          }
+        },
+      })
+    ).toBe(true)
+  })
+
+  it('contains timing event', () => {
+    expect(
+      logContains({
+        event: {
+          event: 'unstruct',
+          platform: 'mob',
+          app_id: 'CFe23a',
+          user_id: 'Malcolm',
+          unstruct_event: {
+            data: {
+              schema: 'iglu:com.snowplowanalytics.snowplow/timing/jsonschema/1-0-0',
+              data: {
+                category: "load",
+                variable: "map_loaded",
+                timing: 50,
+                label: "Map loading time"
+              }
+            }
+          }
+        },
+      })
+    ).toBe(true)
+  })
+
+  it('contains consent granted event', () => {
+    expect(
+      logContains({
+        event: {
+          event: 'unstruct',
+          platform: 'mob',
+          app_id: 'CFe23a',
+          user_id: 'Malcolm',
+          contexts: {
+            data: [{
+              schema: 'iglu:com.snowplowanalytics.snowplow/consent_document/jsonschema/1-0-0',
+              data: {
+                id: "1234",
+                version: "5",
+                name: "consent_document",
+                description: "a document granting consent"
+              }
+            }]
+          },
+          unstruct_event: {
+            data: {
+              schema: 'iglu:com.snowplowanalytics.snowplow/consent_granted/jsonschema/1-0-0',
+              data: {
+                expiry: "2020-11-21T08:00:00.000Z"
+              }
+            }
+          }
+        },
+      })
+    ).toBe(true)
+  })
+
+  it('contains consent withdrawn event', () => {
+    expect(
+      logContains({
+        event: {
+          event: 'unstruct',
+          platform: 'mob',
+          app_id: 'CFe23a',
+          user_id: 'Malcolm',
+          contexts: {
+            data: [{
+              schema: 'iglu:com.snowplowanalytics.snowplow/consent_document/jsonschema/1-0-0',
+              data: {
+                id: "1234",
+                version: "5",
+                name: "consent_document",
+                description: "a document withdrawing consent"
+              }
+            }]
+          },
+          unstruct_event: {
+            data: {
+              schema: 'iglu:com.snowplowanalytics.snowplow/consent_withdrawn/jsonschema/1-0-0',
+              data: {
+                all: false
+              }
+            }
+          }
+        },
+      })
+    ).toBe(true)
+  })
+
+  it('contains custom error event', () => {
+    expect(
+      logContains({
+        event: {
+          event: 'unstruct',
+          platform: 'mob',
+          app_id: 'CFe23a',
+          user_id: 'Malcolm',
+          unstruct_event: {
+            data: {
+              schema: 'iglu:com.snowplowanalytics.snowplow/application_error/jsonschema/1-0-1',
+              data: {
+                programmingLanguage: "JAVASCRIPT",
+                lineNumber: 237,
+                lineColumn: 5,
+                fileName: "trackError.js"
+              }
+            }
+          }
+        },
+      })
+    ).toBe(true)
+  })
+
+  it('contains enhanced ecommerce event', () => {
+    expect(
+      logContains({
+        event: {
+          event: 'unstruct',
+          platform: 'mob',
+          app_id: 'CFe23a',
+          user_id: 'Malcolm',
+          contexts: {
+            data: [{
+              schema: 'iglu:com.google.analytics.enhanced-ecommerce/actionFieldObject/jsonschema/1-0-0',
+              data: {
+                id: 'T12345',
+                affiliation: 'Google Store - Online',
+                revenue: 37.39,
+                tax: 2.85,
+                shipping: 5.34,
+                coupon: 'WINTER2016'
+              }
+            },
+            {
+              schema: 'iglu:com.google.analytics.enhanced-ecommerce/impressionFieldObject/jsonschema/1-0-0',
+              data: {
+                id: 'P12345',
+                name: 'Android Warhol T-Shirt',
+                list: 'Search Results',
+                brand: 'Google',
+                category: 'Apparel/T-Shirts',
+                variant: 'Black',
+                position: 1
+              }
+            },
+            {
+              schema: 'iglu:com.google.analytics.enhanced-ecommerce/productFieldObject/jsonschema/1-0-0',
+              data: {
+                id: 'P12345',
+                name: 'Android Warhol T-Shirt',
+                list: 'Search Results',
+                brand: 'Google',
+                category: 'Apparel/T-Shirts',
+                variant: 'Black',
+                price: 1
+              }
+            },
+            {
+              schema: 'iglu:com.google.analytics.enhanced-ecommerce/promoFieldObject/jsonschema/1-0-0',
+              data: {
+                id: 'PROMO_1234',
+                name: 'Summer Sale',
+                creative: 'summer_banner2',
+                position: 'banner_slot1'
+              }
+            }]
+          },
+          unstruct_event: {
+            data: {
+              schema: 'iglu:com.google.analytics.enhanced-ecommerce/action/jsonschema/1-0-0',
+              data: {
+                action: 'purchase'
+              }
+            }
+          }
+        },
+      })
+    ).toBe(true)
+  })
+
 })
