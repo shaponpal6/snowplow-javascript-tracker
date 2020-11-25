@@ -66,5 +66,11 @@ describe('Tracker created domain cookies', () => {
     expect(cookies).toContain('_sp_2id.');
     expect(cookies).toContain('_sp_6ses.');
     expect(cookies).toContain('_sp_6id.');
+
+    expect($('#getDomainUserId').getText()).toMatch(/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/i);
+    expect($('#getDomainUserInfo').getText()).toMatch(/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b.[0-9]+.[0-9].[0-9]+.[0-9]+.\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/i);
+    expect($('#getUserId').getText()).toBe('Dave');
+    expect($('#getCookieName').getText()).toMatch(/_sp_1id.[0-9a-z]{4}/i);
+    expect($('#getPageViewId').getText()).toMatch(/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/i);
   })
 })

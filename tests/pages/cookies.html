@@ -6,6 +6,11 @@
   <body style="width: 2000px; height: 2000px; position: relative;">
     <div id="init"></div>
     <div id="cookies"></div>
+    <div id="getDomainUserId"></div>
+    <div id="getDomainUserInfo"></div>
+    <div id="getUserId"></div>
+    <div id="getCookieName"></div>
+    <div id="getPageViewId"></div>
     <script>
       ;(function(p,l,o,w,i,n,g){if(!p[i]){p.GlobalSnowplowNamespace=p.GlobalSnowplowNamespace||[];
         p.GlobalSnowplowNamespace.push(i);p[i]=function(){(p[i].q=p[i].q||[]).push(arguments)
@@ -23,6 +28,8 @@
         cookieSameSite: "Lax",
         cookieSecure: false,
       });
+
+      snowplow('setUserId:sp1', 'Dave');
 
       snowplow('newTracker', 'sp2', 'snowplow-js-tracker.local:9090',
       {
@@ -75,6 +82,11 @@
 
       snowplow(function() {
         document.getElementById('init').innerText = 'true';
+        document.getElementById('getDomainUserId').innerText = this.sp1.getDomainUserId();
+        document.getElementById('getDomainUserInfo').innerText = this.sp1.getDomainUserInfo();
+        document.getElementById('getUserId').innerText = this.sp1.getUserId();
+        document.getElementById('getCookieName').innerText = this.sp1.getCookieName('id');
+        document.getElementById('getPageViewId').innerText = this.sp1.getPageViewId();
       });
 
       setTimeout(function() {
