@@ -58,7 +58,7 @@ describe('Activity tracking should send page pings', () => {
     browser.waitUntil(
       () => $('#init').getText() === 'true',
       5000,
-      'expected init after 10s'
+      'expected init after 5s'
     )
   })
 

@@ -53,7 +53,7 @@ describe('Test that request_recorder logs meet expectations', () => {
     browser.url('/index.html')
     browser.setCookies({ name: 'container', value: docker.url })
     browser.url('/session-integration.html')
-    browser.pause(10000) // Time for requests to get written
+    browser.pause(5000) // Time for requests to get written
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
