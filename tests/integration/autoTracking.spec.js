@@ -397,7 +397,7 @@ describe('Auto tracking', () => {
   it('should send focus_form and change_form on select change', () => {
     $('#cars').click()
     $('#cars').selectByAttribute('value', 'saab')
-    $('#cars').click()
+    $('#saab').click()
 
     // time for activity to register and request to arrive
     browser.pause(3000)
