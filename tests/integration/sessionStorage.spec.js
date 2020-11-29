@@ -37,7 +37,7 @@ import { fetchResults, start, stop } from '../micro'
 
 const dumpLog = log => console.log(util.inspect(log, true, null, true))
 
-describe('Test that request_recorder logs meet expectations', () => {
+describe('Sessions', () => {
   let log = []
   let docker
 

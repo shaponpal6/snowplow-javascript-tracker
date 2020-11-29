@@ -32,7 +32,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-describe('Helpers test', () => {
+describe('Helpers', () => {
   it('Gets page title', () => {
     browser.url('/helpers.html')
     $('body.loaded').waitForExist()

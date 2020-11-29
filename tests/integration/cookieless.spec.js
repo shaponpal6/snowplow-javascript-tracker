@@ -44,7 +44,7 @@ const retrieveSchemaData = schema =>
 		F.get('data')
 	)
 
-describe('Test that request_recorder logs meet expectations', () => {
+describe('Anonymous tracking features', () => {
 	let log = []
 	let docker
 
@@ -60,7 +60,7 @@ describe('Test that request_recorder logs meet expectations', () => {
 		browser.url('/index.html')
 		browser.setCookies({ name: 'container', value: docker.url })
 		browser.url('/cookieless.html')
-		browser.pause(3000) // Time for requests to get written
+		browser.pause(5000) // Time for requests to get written
 		browser.call(() =>
 		  fetchResults(docker.url).then(result => {
 			log = result
@@ -74,7 +74,7 @@ describe('Test that request_recorder logs meet expectations', () => {
 		})
 	  })
 
-	it('Check existence of page view without sensitive fields', () => {
+	it('should have no sensitive information in page view', () => {
 		expect(
 			logContains({
 				event: {

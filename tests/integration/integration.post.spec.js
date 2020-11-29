@@ -60,7 +60,7 @@ const geoContext = {
   },
 }
 
-describe('Snowplow Micro integration test', () => {
+describe('POST: Snowplow Micro integration', () => {
   let log = []
   let docker
 

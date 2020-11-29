@@ -34,7 +34,7 @@
 import F from 'lodash/fp'
 import moment from 'moment-timezone'
 
-describe('Detectors test', () => {
+describe('Detectors', () => {
   beforeAll(() => {
     browser.url('/detectors.html')
     $('body.loaded').waitForExist()
