@@ -43,6 +43,10 @@ const isMatchWithCallback = F.isMatchWith((lt, rt) =>
 )
 
 describe('Auto tracking', () => {
+  if (F.isMatch({ browserName: 'internet explorer', version: '9' }, browser.capabilities)) {
+    fit('Skip IE9', () => {}) // Automated tests for IE autotracking features 
+  }
+
   let log = []
   let docker
 
@@ -74,7 +78,7 @@ describe('Auto tracking', () => {
   it('should send a link click event', () => {
     $('#link-to-click').click()
     // time for activity to register and request to arrive
-    browser.pause(3000)
+    browser.pause(10000)
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result

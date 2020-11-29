@@ -54,7 +54,7 @@ describe('Helpers', () => {
     expect(value).toBe('previous')
   })
 
-  it('Can add an even listener', () => {
+  it('Can add an event listener', () => {
     browser.url('/helpers.html')
     $('body.loaded').waitForExist()
     $('#click').click()
