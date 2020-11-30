@@ -50,6 +50,10 @@ describe('Auto tracking', () => {
   let log = []
   let docker
 
+  // These values can change depending on browser under test
+  let expectedFirstName = 'Alex';
+  let expectedMessage = 'Changed message';
+
   const logContains = ev => F.some(isMatchWithCallback(ev), log)
 
   beforeAll(() => {
@@ -281,8 +285,6 @@ describe('Auto tracking', () => {
   })
 
   it('should send focus_form and change_form on text input', () => {
-    var expectedFirstName = 'Alex';
-
     browser.url('/form-tracking.html')
     browser.waitUntil(
       () => $('#init').getText() === 'true',
@@ -466,8 +468,6 @@ describe('Auto tracking', () => {
   })
 
   it('should send focus_form and change_form on textarea input', () => {
-    var expectedMessage = 'Changed message';
-
     $('#message').click()
 
     // Edge 13 doesn't support setValue so we invert the logic
@@ -588,12 +588,12 @@ describe('Auto tracking', () => {
                 elements: [
                   {
                     name: 'message',
-                    value: '',
+                    value: expectedMessage,
                     nodeName: 'TEXTAREA'
                   },
                   {
                     name: 'fname',
-                    value: '',
+                    value: expectedFirstName,
                     nodeName: 'INPUT',
                     type: 'text'
                   },
