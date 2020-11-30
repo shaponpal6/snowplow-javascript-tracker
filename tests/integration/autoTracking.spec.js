@@ -78,7 +78,7 @@ describe('Auto tracking', () => {
   it('should send a link click event', () => {
     $('#link-to-click').click()
     // time for activity to register and request to arrive
-    browser.pause(10000)
+    browser.pause(5000)
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
@@ -122,7 +122,7 @@ describe('Auto tracking', () => {
     $('#link-to-not-track').click()
     $('#link-to-click').click()
     // time for activity to register and request to arrive
-    browser.pause(3000)
+    browser.pause(5000)
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
@@ -178,7 +178,7 @@ describe('Auto tracking', () => {
     $('#link-to-filter').click()
     $('#link-to-click').click()
     // time for activity to register and request to arrive
-    browser.pause(3000)
+    browser.pause(5000)
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
@@ -234,7 +234,7 @@ describe('Auto tracking', () => {
     $('#link-to-filter').click()
     $('#link-to-click').click()
     // time for activity to register and request to arrive
-    browser.pause(3000)
+    browser.pause(5000)
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
@@ -281,6 +281,8 @@ describe('Auto tracking', () => {
   })
 
   it('should send focus_form and change_form on text input', () => {
+    var expectedFirstName = 'Alex';
+
     browser.url('/form-tracking.html')
     browser.waitUntil(
       () => $('#init').getText() === 'true',
@@ -288,10 +290,19 @@ describe('Auto tracking', () => {
       'expected init after 5s'
     )
     $('#fname').click()
-    $('#fname').clearValue()
+
+    // Edge 13 doesn't support setValue so we invert the logic
+    // However some browsers don't fire onchange events when clearing...
+    if (F.isMatch({ browserName: 'MicrosoftEdge', browserVersion: '25.10586.0.0' }, browser.capabilities)) {
+      expectedFirstName = '';
+      $('#fname').clearValue()
+    } else {
+      $('#fname').setValue(expectedFirstName)
+    }
+
     $('#lname').click()
     // time for activity to register and request to arrive
-    browser.pause(3000)
+    browser.pause(5000)
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
@@ -334,7 +345,7 @@ describe('Auto tracking', () => {
                 nodeName: 'INPUT',
                 type: 'text',
                 elementClasses: ['test'],
-                value: ''
+                value: expectedFirstName
               }
             } 
           }
@@ -368,7 +379,7 @@ describe('Auto tracking', () => {
   it('should send change_form on radio input', () => {
     $('#bike').click()
     // time for activity to register and request to arrive
-    browser.pause(3000)
+    browser.pause(5000)
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
@@ -401,10 +412,10 @@ describe('Auto tracking', () => {
   it('should send focus_form and change_form on select change', () => {
     $('#cars').click()
     $('#cars').selectByAttribute('value', 'saab')
-    $('#saab').click()
+    $('#cars').click()
 
     // time for activity to register and request to arrive
-    browser.pause(3000)
+    browser.pause(5000)
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
@@ -455,11 +466,22 @@ describe('Auto tracking', () => {
   })
 
   it('should send focus_form and change_form on textarea input', () => {
+    var expectedMessage = 'Changed message';
+
     $('#message').click()
-    $('#message').clearValue()
+
+    // Edge 13 doesn't support setValue so we invert the logic
+    // However some browsers don't fire onchange events when clearing...
+    if (F.isMatch({ browserName: 'MicrosoftEdge', browserVersion: '25.10586.0.0' }, browser.capabilities)) {
+      expectedMessage = '';
+      $('#message').clearValue()
+    } else {
+      $('#message').setValue(expectedMessage)
+    }
+
     $('#lname').click()
     // time for activity to register and request to arrive
-    browser.pause(3000)
+    browser.pause(5000)
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
@@ -479,7 +501,7 @@ describe('Auto tracking', () => {
                 elementId: 'message',
                 nodeName: 'TEXTAREA',
                 elementClasses: [],
-                value: 'This is a message'
+                value: expectedMessage
               }
             } 
           }
@@ -512,7 +534,7 @@ describe('Auto tracking', () => {
   it('should send change_form on checkbox', () => {
     $('#terms').click()
     // time for activity to register and request to arrive
-    browser.pause(3000)
+    browser.pause(5000)
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
@@ -545,7 +567,7 @@ describe('Auto tracking', () => {
   it('should send submit_form on form submission', () => {
     $('#submit').click()
     // time for activity to register and request to arrive
-    browser.pause(3000)
+    browser.pause(5000)
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
@@ -623,7 +645,7 @@ describe('Auto tracking', () => {
     $('#fname').click()
     $('#lname').click()
     // time for activity to register and request to arrive
-    browser.pause(3000)
+    browser.pause(5000)
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
@@ -676,7 +698,7 @@ describe('Auto tracking', () => {
     )
     $('#lname').click()
     // time for activity to register and request to arrive
-    browser.pause(3000)
+    browser.pause(5000)
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
@@ -712,7 +734,7 @@ describe('Auto tracking', () => {
     $('#fname').click()
     $('#lname').click()
     // time for activity to register and request to arrive
-    browser.pause(3000)
+    browser.pause(5000)
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
@@ -765,7 +787,7 @@ describe('Auto tracking', () => {
     )
     $('#excluded-fname').click()
     // time for activity to register and request to arrive
-    browser.pause(3000)
+    browser.pause(5000)
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
@@ -793,7 +815,7 @@ describe('Auto tracking', () => {
   it('should not send submit_form', () => {
     $('#excluded-submit').click()
     // time for activity to register and request to arrive
-    browser.pause(3000)
+    browser.pause(5000)
     browser.call(() =>
       fetchResults(docker.url).then(result => {
         log = result
