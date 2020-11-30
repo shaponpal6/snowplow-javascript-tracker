@@ -292,7 +292,7 @@ describe('Auto tracking', () => {
     // Safari 12.1 doesn't fire onchange events when clearing
     // However some browsers don't support setValue
     let expectedFirstName
-    if (F.isMatch({ browserName: 'safari', browserVersion: '12.1' }, browser.capabilities)) {
+    if (F.isMatch({ browserName: 'Safari', browserVersion: '12.1.1' }, browser.capabilities)) {
       expectedFirstName = 'Alex'
       $('#fname').setValue(expectedFirstName)
     } else {
@@ -471,7 +471,7 @@ describe('Auto tracking', () => {
     // Safari 12.1 doesn't fire onchange events when clearing
     // However some browsers don't support setValue
     let expectedMessage
-    if (F.isMatch({ browserName: 'safari', browserVersion: '12.1' }, browser.capabilities)) {
+    if (F.isMatch({ browserName: 'Safari', browserVersion: '12.1.1' }, browser.capabilities)) {
       expectedMessage = 'Changed message'
       $('#message').setValue(expectedMessage)
     } else {
@@ -577,7 +577,7 @@ describe('Auto tracking', () => {
     // Safari 12.1 doesn't fire onchange events when clearing
     // However some browsers don't support setValue
     let expectedFirstName = '', expectedMessage = ''
-    if (F.isMatch({ browserName: 'safari', browserVersion: '12.1' }, browser.capabilities)) {
+    if (F.isMatch({ browserName: 'Safari', browserVersion: '12.1.1' }, browser.capabilities)) {
       expectedFirstName = 'Alex'
       expectedMessage = 'Changed message'
     }
