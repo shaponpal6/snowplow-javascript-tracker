@@ -414,6 +414,11 @@ describe('Auto tracking', () => {
     $('#cars').selectByAttribute('value', 'saab')
     $('#cars').click()
 
+    // MS Edge <= 18 doesn't fire change events on select elements via Edge WebDriver
+    if (F.isMatch({ browserName: 'MicrosoftEdge', browserVersion: '25.10586.0.0' }, browser.capabilities)) {
+      return;
+    }
+
     // time for activity to register and request to arrive
     browser.pause(5000)
     browser.call(() =>
