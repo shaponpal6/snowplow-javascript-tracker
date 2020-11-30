@@ -50,10 +50,6 @@ describe('Auto tracking', () => {
   let log = []
   let docker
 
-  // These values can change depending on browser under test
-  let expectedFirstName = 'Alex';
-  let expectedMessage = 'Changed message';
-
   const logContains = ev => F.some(isMatchWithCallback(ev), log)
 
   beforeAll(() => {
@@ -293,13 +289,15 @@ describe('Auto tracking', () => {
     )
     $('#fname').click()
 
-    // Edge 13 doesn't support setValue so we invert the logic
-    // However some browsers don't fire onchange events when clearing...
-    if (F.isMatch({ browserName: 'MicrosoftEdge', browserVersion: '25.10586.0.0' }, browser.capabilities)) {
+    // Safari 12.1 doesn't fire onchange events when clearing
+    // However some browsers don't support setValue
+    let expectedFirstName
+    if (F.isMatch({ browserName: 'safari', browserVersion: '12.1' }, browser.capabilities)) {
+      expectedFirstName = 'Alex'
+      $('#fname').setValue(expectedFirstName)
+    } else {
       expectedFirstName = '';
       $('#fname').clearValue()
-    } else {
-      $('#fname').setValue(expectedFirstName)
     }
 
     $('#lname').click()
@@ -470,13 +468,15 @@ describe('Auto tracking', () => {
   it('should send focus_form and change_form on textarea input', () => {
     $('#message').click()
 
-    // Edge 13 doesn't support setValue so we invert the logic
-    // However some browsers don't fire onchange events when clearing...
-    if (F.isMatch({ browserName: 'MicrosoftEdge', browserVersion: '25.10586.0.0' }, browser.capabilities)) {
+    // Safari 12.1 doesn't fire onchange events when clearing
+    // However some browsers don't support setValue
+    let expectedMessage
+    if (F.isMatch({ browserName: 'safari', browserVersion: '12.1' }, browser.capabilities)) {
+      expectedMessage = 'Changed message'
+      $('#message').setValue(expectedMessage)
+    } else {
       expectedMessage = '';
       $('#message').clearValue()
-    } else {
-      $('#message').setValue(expectedMessage)
     }
 
     $('#lname').click()
@@ -501,7 +501,7 @@ describe('Auto tracking', () => {
                 elementId: 'message',
                 nodeName: 'TEXTAREA',
                 elementClasses: [],
-                value: expectedMessage
+                value: 'This is a message'
               }
             } 
           }
@@ -522,7 +522,7 @@ describe('Auto tracking', () => {
                 elementId: 'message',
                 nodeName: 'TEXTAREA',
                 elementClasses: [],
-                value: ''
+                value: expectedMessage
               }
             } 
           }
@@ -573,6 +573,14 @@ describe('Auto tracking', () => {
         log = result
       })
     )
+
+    // Safari 12.1 doesn't fire onchange events when clearing
+    // However some browsers don't support setValue
+    let expectedFirstName = '', expectedMessage = ''
+    if (F.isMatch({ browserName: 'safari', browserVersion: '12.1' }, browser.capabilities)) {
+      expectedFirstName = 'Alex'
+      expectedMessage = 'Changed message'
+    }
 
     expect(
       logContains({
